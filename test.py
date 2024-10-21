@@ -116,7 +116,7 @@ def summarize_text(text: str) -> str:
             "You are a helpful assistant that summarizes academic documents.\n\n"
             f"Summarize the following text in a concise manner:\n\n{text}"
         )
-        response = openai.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that summarizes academic documents."},
@@ -146,7 +146,7 @@ def extract_topics(text: str) -> List[str]:
             "You are an expert in extracting key topics from academic texts.\n\n"
             f"Extract the top 5 key topics from the following text:\n\n{text}"
         )
-        response = openai.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are an expert in extracting key topics from academic texts."},
@@ -186,7 +186,7 @@ def generate_questions_batch(text: str, topics: List[str], num_questions: int) -
             f"Questions:\n1."
         )
 
-        response = openai.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that generates academic questions."},
@@ -224,7 +224,7 @@ def fetch_answer(question: str, text: str) -> str:
             f"Question: {question}\n\n"
             f"Answer:"
         )
-        response = openai.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a knowledgeable and helpful assistant."},

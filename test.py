@@ -13,7 +13,9 @@ import streamlit as st
 import fitz  # PyMuPDF for PDF processing
 
 import openai
-from openai import RateLimitError, OpenAIError
+# from openai import APIError, APIError
+from openai import APIError
+
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -125,7 +127,7 @@ def summarize_text(text: str) -> str:
         )
         summary = response.choices[0].message.content.strip()
         return summary
-    except OpenAIError as e:
+    except APIError as e:
         st.error(f"Error during summarization: {e}")
         return text  # Return original text if summarization fails
 
@@ -158,7 +160,7 @@ def extract_topics(text: str) -> List[str]:
         topics = re.split(r',|\n|\d+\.', topics_text)
         topics = [topic.strip().strip('-').strip() for topic in topics if topic.strip()]
         return topics[:5]  # Limit to top 5 topics
-    except OpenAIError as e:
+    except APIError as e:
         st.error(f"Error during topic extraction: {e}")
         return []
 
@@ -200,7 +202,7 @@ def generate_questions_batch(text: str, topics: List[str], num_questions: int) -
         # Clean and format questions
         questions = [q.strip().lstrip('. ').rstrip('?') + '?' for q in questions if q.strip()]
         return questions[:num_questions]
-    except OpenAIError as e:
+    except APIError as e:
         st.error(f"Error during question generation: {e}")
         return []
 
@@ -233,7 +235,7 @@ def fetch_answer(question: str, text: str) -> str:
         )
         answer = response.choices[0].message.content.strip()
         return answer
-    except OpenAIError as e:
+    except APIError as e:
         st.error(f"Error during answer fetching: {e}")
         return "An error occurred while generating the answer."
 
@@ -252,11 +254,11 @@ def fetch_answer_with_backoff(question: str, text: str, max_retries: int = 3) ->
     for attempt in range(max_retries):
         try:
             return fetch_answer(question, text)
-        except RateLimitError:
+        except APIError:
             wait_time = (2 ** attempt) + random.uniform(0, 1)
             st.warning(f"Rate limit exceeded. Retrying in {wait_time:.2f} seconds...")
             time.sleep(wait_time)
-        except OpenAIError as e:
+        except APIError as e:
             st.error(f"Error during answer fetching: {e}")
             break
     st.error("Max retries exceeded. Unable to fetch answer at this time.")
